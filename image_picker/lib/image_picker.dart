@@ -334,6 +334,68 @@ class ImagePicker {
     );
   }
 
+  /// Returns a [List<XFile>] object wrapping the images and videos that were picked.
+  ///
+  /// The returned [List<XFile>] is intended to be used within a single APP session. Do not save the file path and use it across sessions.
+  ///
+  /// Where iOS supports HEIC images, Android 8 and below doesn't. Android 9 and above only support HEIC images if used
+  /// in addition to a size modification, of which the usage is explained below.
+  ///
+  /// This method is not supported in iOS versions lower than 14.
+  ///
+  /// If specified, the images will be at most `maxImageWidth` wide and
+  /// `maxImageHeight` tall. Otherwise the images will be returned at it's
+  /// original width and height.
+  ///
+  /// The `imageQuality` argument modifies the quality of the images, ranging from 0-100
+  /// where 100 is the original/max quality. If `imageQuality` is null, the images with
+  /// the original quality will be returned. Compression is only supported for certain
+  /// image types such as JPEG and on Android PNG and WebP, too. If compression is not
+  /// supported for the image that is picked, a warning message will be logged.
+  ///
+  /// Use `requestFullMetadata` (defaults to `true`) to control how much additional
+  /// information the plugin tries to get.
+  /// If `requestFullMetadata` is set to `true`, the plugin tries to get the full
+  /// image metadata which may require extra permission requests on some platforms,
+  /// such as `Photo Library Usage` permission on iOS.
+  ///
+  /// The method could throw [PlatformException] if the app does not have permission to access
+  /// the camera or photos gallery, no camera is available, plugin is already in use,
+  /// temporary file could not be created (iOS only), plugin activity could not
+  /// be allocated (Android only) or due to an unknown error.
+  ///
+  /// See also [pickImage] to allow users to only pick a single image.
+  Future<List<XFile>> pickMultiMedia({
+    double? maxImageWidth,
+    double? maxImageHeight,
+    int? imageQuality,
+    bool requestFullMetadata = true,
+  }) {
+    if (imageQuality != null && (imageQuality < 0 || imageQuality > 100)) {
+      throw ArgumentError.value(
+          imageQuality, 'imageQuality', 'must be between 0 and 100');
+    }
+    if (maxImageWidth != null && maxImageWidth < 0) {
+      throw ArgumentError.value(
+          maxImageWidth, 'maxImageWidth', 'cannot be negative');
+    }
+    if (maxImageHeight != null && maxImageHeight < 0) {
+      throw ArgumentError.value(
+          maxImageHeight, 'maxIMageHeight', 'cannot be negative');
+    }
+
+    return platform.getMultiMediaWithOptions(
+      options: MultiMediaPickerOptions(
+        imageOptions: ImageOptions(
+          maxWidth: maxImageWidth,
+          maxHeight: maxImageHeight,
+          imageQuality: imageQuality,
+          requestFullMetadata: requestFullMetadata,
+        ),
+      ),
+    );
+  }
+
   /// Retrieve the lost [XFile] when [pickImage], [pickMultiImage] or [pickVideo] failed because the MainActivity
   /// is destroyed. (Android only)
   ///

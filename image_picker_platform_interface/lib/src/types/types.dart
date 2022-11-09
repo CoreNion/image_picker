@@ -8,6 +8,7 @@ export 'image_picker_options.dart';
 export 'image_source.dart';
 export 'lost_data_response.dart';
 export 'multi_image_picker_options.dart';
+export 'multi_media_picker_options.dart';
 export 'picked_file/picked_file.dart';
 export 'retrieve_type.dart';
 

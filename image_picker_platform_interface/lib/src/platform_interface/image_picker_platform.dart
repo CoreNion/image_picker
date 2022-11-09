@@ -129,6 +129,32 @@ abstract class ImagePickerPlatform extends PlatformInterface {
     throw UnimplementedError('pickVideo() has not been implemented.');
   }
 
+  /// Returns a [List<PickedFile>] with the images and videos that were picked.
+  ///
+  /// The images and videos come from the [ImageSource.gallery].
+  ///
+  /// Where iOS supports HEIC images, Android 8 and below doesn't. Android 9 and above only support HEIC images if used
+  /// in addition to a size modification, of which the usage is explained below.
+  ///
+  /// If specified, the image will be at most `maxImageWidth` wide and
+  /// `maxImageHeight` tall. Otherwise the image will be returned at it's
+  /// original width and height.
+  ///
+  /// The `imageQuality` argument modifies the quality of the images, ranging from 0-100
+  /// where 100 is the original/max quality. If `imageQuality` is null, the images with
+  /// the original quality will be returned. Compression is only supported for certain
+  /// image types such as JPEG. If compression is not supported for the image that is picked,
+  /// a warning message will be logged.
+  ///
+  /// If no images and videos were picked, the return value is null.
+  Future<List<PickedFile>?> pickMultiMedia({
+    double? maxImageWidth,
+    double? maxImageHeight,
+    int? imageQuality,
+  }) {
+    throw UnimplementedError('pickMultiMedia() has not been implemented.');
+  }
+
   /// Retrieves any previously picked file, that was lost due to the MainActivity being destroyed.
   /// In case multiple files were lost, only the last file will be recovered. (Android only).
   ///
@@ -210,6 +236,34 @@ abstract class ImagePickerPlatform extends PlatformInterface {
   Future<List<XFile>?> getMultiImage({
     double? maxWidth,
     double? maxHeight,
+    int? imageQuality,
+  }) {
+    throw UnimplementedError('getMultiImage() has not been implemented.');
+  }
+
+  /// This method is deprecated in favor of [getMultiMediaWithOptions] and will be removed in a future update.
+  ///
+  /// Returns a [List<XFile>] with the images and videos that were picked.
+  ///
+  /// The images and videos come from the [ImageSource.gallery].
+  ///
+  /// Where iOS supports HEIC images, Android 8 and below doesn't. Android 9 and above only support HEIC images if used
+  /// in addition to a size modification, of which the usage is explained below.
+  ///
+  /// If specified, the image will be at most `maxImageWidth` wide and
+  /// `maxImageHeight` tall. Otherwise the image will be returned at it's
+  /// original width and height.
+  ///
+  /// The `imageQuality` argument modifies the quality of the images, ranging from 0-100
+  /// where 100 is the original/max quality. If `imageQuality` is null, the images with
+  /// the original quality will be returned. Compression is only supported for certain
+  /// image types such as JPEG. If compression is not supported for the image that is picked,
+  /// a warning message will be logged.
+  ///
+  /// If no images and videos were picked, the return value is null.
+  Future<List<XFile>?> getMultiMedia({
+    double? maxImageWidth,
+    double? maxImageHeight,
     int? imageQuality,
   }) {
     throw UnimplementedError('getMultiImage() has not been implemented.');
@@ -304,5 +358,24 @@ abstract class ImagePickerPlatform extends PlatformInterface {
       imageQuality: options.imageOptions.imageQuality,
     );
     return pickedImages ?? <XFile>[];
+  }
+
+  /// Returns a [List<XFile>] with the images and videos that were picked.
+  ///
+  /// The images and videos come from the [ImageSource.gallery].
+  ///
+  /// The `options` argument controls additional settings that can be used when
+  /// picking an image. See [MultiMediaPickerOptions] for more details.
+  ///
+  /// If no images and videos were picked, returns an empty list.
+  Future<List<XFile>> getMultiMediaWithOptions({
+    MultiMediaPickerOptions options = const MultiMediaPickerOptions(),
+  }) async {
+    final List<XFile>? pickedMedias = await getMultiMedia(
+      maxImageWidth: options.imageOptions.maxWidth,
+      maxImageHeight: options.imageOptions.maxHeight,
+      imageQuality: options.imageOptions.imageQuality,
+    );
+    return pickedMedias ?? <XFile>[];
   }
 }
