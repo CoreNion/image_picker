@@ -83,6 +83,56 @@ class MethodChannelImagePicker extends ImagePickerPlatform {
     );
   }
 
+  @override
+  Future<List<PickedFile>?> pickMultiMedia({
+    double? maxImageWidth,
+    double? maxImageHeight,
+    int? imageQuality,
+  }) async {
+    final List<dynamic>? paths = await _getMultiMediaPath(
+      maxImageWidth: maxImageWidth,
+      maxImageHeight: maxImageHeight,
+      imageQuality: imageQuality,
+    );
+    if (paths == null) {
+      return null;
+    }
+
+    return paths.map((dynamic path) => PickedFile(path as String)).toList();
+  }
+
+  Future<List<dynamic>?> _getMultiMediaPath({
+    double? maxImageWidth,
+    double? maxImageHeight,
+    int? imageQuality,
+    bool requestFullMetadata = true,
+  }) {
+    if (imageQuality != null && (imageQuality < 0 || imageQuality > 100)) {
+      throw ArgumentError.value(
+          imageQuality, 'imageQuality', 'must be between 0 and 100');
+    }
+
+    if (maxImageWidth != null && maxImageWidth < 0) {
+      throw ArgumentError.value(
+          maxImageWidth, 'maxImageWidth', 'cannot be negative');
+    }
+
+    if (maxImageHeight != null && maxImageHeight < 0) {
+      throw ArgumentError.value(
+          maxImageHeight, 'maxImageHeight', 'cannot be negative');
+    }
+
+    return _channel.invokeMethod<List<dynamic>?>(
+      'pickMultiMedia',
+      <String, dynamic>{
+        'maxImageWidth': maxImageWidth,
+        'maxImageHeight': maxImageHeight,
+        'imageQuality': imageQuality,
+        'requestFullMetadata': requestFullMetadata,
+      },
+    );
+  }
+
   Future<String?> _getImagePath({
     required ImageSource source,
     double? maxWidth,
@@ -249,6 +299,40 @@ class MethodChannelImagePicker extends ImagePickerPlatform {
       return <XFile>[];
     }
 
+    return paths.map((dynamic path) => XFile(path as String)).toList();
+  }
+
+  @override
+  Future<List<XFile>?> getMultiMedia({
+    double? maxImageWidth,
+    double? maxImageHeight,
+    int? imageQuality,
+  }) async {
+    final List<dynamic>? paths = await _getMultiMediaPath(
+      maxImageWidth: maxImageWidth,
+      maxImageHeight: maxImageHeight,
+      imageQuality: imageQuality,
+    );
+    if (paths == null) {
+      return null;
+    }
+
+    return paths.map((dynamic path) => XFile(path as String)).toList();
+  }
+
+  @override
+  Future<List<XFile>> getMultiMediaWithOptions({
+    MultiMediaPickerOptions options = const MultiMediaPickerOptions(),
+  }) async {
+    final List<dynamic>? paths = await _getMultiMediaPath(
+      maxImageWidth: options.imageOptions.maxWidth,
+      maxImageHeight: options.imageOptions.maxHeight,
+      imageQuality: options.imageOptions.imageQuality,
+      requestFullMetadata: options.imageOptions.requestFullMetadata,
+    );
+    if (paths == null) {
+      return <XFile>[];
+    }
     return paths.map((dynamic path) => XFile(path as String)).toList();
   }
 
